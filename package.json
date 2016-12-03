@@ -1,0 +1,26 @@
+{
+  "name": "robot-bartender",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-jwt": "^5.1.0",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "johnny-five": "^0.10.6",
+    "jsonwebtoken": "^7.1.9",
+    "lodash": "^4.17.2",
+    "mongoose": "^4.7.0",
+    "path": "^0.12.7",
+    "sanitize-html": "^1.13.0",
+    "socket.io": "^1.6.0"
+  }
+}
