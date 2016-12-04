@@ -1,7 +1,26 @@
-<div>
-   <h2 class='text-center'>Bar-Bot</h2>
-   <h4 class='text-center'>The coolest thing you have ever seen.</h4>
-   <div class='text-center'>
-      <button class='btn btn-success' ng-click='buttonClick()'>Test Button</button>
-   </div>
+<div class='container-fluid'>
+   <h2 class='text-center'>Drink Menu</h2>
+   <h4 class='text-center col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12	'>Welcome to the Robo-Bar menu! Please make sure you have the correct size class in the correct location before ordering a drink. Have fun, and be irresponsible.</h4>
+</div>
+
+<div class='container-fluid'>
+	<div class='row'>
+		<div id='drinkRecipe' class='text-center col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1 col-sm-12 col-xs-12'>
+			<div ng-repeat="drink in drinkMenu" class='col-md-6 col-lg-6 col-sm-10 col-xs-10'>
+				<img style="height:200px;"src={{drink.img}}>
+				<h2>{{drink.title}}</h2>
+				<p>{{drink.description}}</p>
+				<p>{{drink.extra}}</p>
+				<div>
+					<h3>Ingredients</h3>
+					<h5 ng-repeat='(key, value) in drink.ingredients.alcohol' ng-show={{value}}>{{key}} : {{value}} Part</h5>	
+					<h5 ng-repeat='(key, value) in drink.ingredients.mixer' ng-show={{value}}>{{key}} : {{value}} Part</h5>
+				</div>
+				<button ng-show="isLoggedIn()" class='btn btn-default' ng-click="isLoggedin()">Add to Favs</button>
+				<button ng-show="isRoot()" class='btn btn-default'>Edit Recipe</button>
+				<button ng-show="isRoot()" class='btn btn-default' ng-click='deleteDrink(this)'>Delete</button></br></br>
+				<button ng-show="isLoggedIn()" class='btn btn-lg btn-danger' ng-click='orderDrink()'>MAKE DRINK</button>
+			</div>
+		</div>
+	</div>
 </div>

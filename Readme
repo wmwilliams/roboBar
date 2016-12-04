@@ -6,4 +6,11 @@ Readme File --Keep updated notes on
 
 
 	12/2/2016
-	
+		-Added post route for drinks and added a few test drink recipes 
+		-Started (very roughly) forming the drink menu page
+		-make drink button sends information to node via sockets
+		-admin user is needed for certain end routes
+
+		TODO: Finish routes/functions for drink buttons/sockets/pourmeadouble?
+			Dynamically add drink recipes and then...
+			FILTER RECIPES by main ingredients

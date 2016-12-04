@@ -16,9 +16,8 @@ var User = require('./server/models/user');
 var Recipe = require('./server/models/drinks');
 var secret = "luc143rforpresident";
 
-
-
 //LOCAL database
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost:27017/barBot');
 
 //execute server code on db connection
@@ -51,14 +50,47 @@ mongoose.connection.once('open', function(){
 		});
 	});
 
+	app.post('/drinks', function(req, res) {
+		// console.log(req.body)
+		var newDrink = Recipe({
+			title: req.body.title,
+			description: req.body.description,
+			img: req.body.img,
+			extra: req.body.extra,
+			ingredients: req.body.ingredients
+		});
+		newDrink.save(function(err) {
+			if(err) console.log(err);
+		})
+	});
+
+	//THIS IS A DELETE ROUTE --FUCK YOU ANGULAR
+	app.post('/drinks/:id', function(req, res) {
+		Recipe.findByIdAndRemove({_id : req.body.data}, function(err, recipe) {
+			if(err || !recipe) console.log(err);
+			console.log("Recipe deleted successfully.");
+		})
+	})
+
+
+
+
 	io.sockets.on('connection', function(socket){
-	  	console.log('CONNECTED');
+	  	console.log('SOCKETS CONNECTED');
 
 		socket.on('news', function (data) {
 		    console.log(data);
 	  	});
+	  	socket.on('drink', function(data) {
+	  		// console.log(data);
+	  		makeDrink(data);
+	  	})
 
 	});
+	makeDrink = function(data) {
+		console.log(data);
+		console.log('Server making drink function');
+	};
 
 	var routes = require('./server/routes');
 	_.each(routes, function(controller, route) {
