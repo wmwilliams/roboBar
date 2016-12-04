@@ -10,7 +10,8 @@ Readme File --Keep updated notes on
 		-Started (very roughly) forming the drink menu page
 		-make drink button sends information to node via sockets
 		-admin user is needed for certain end routes
+		-added delete ability for recipes
 
-		TODO: Finish routes/functions for drink buttons/sockets/pourmeadouble?
+		TODO: Finish routes/functions for user favorites and double functionality!
 			Dynamically add drink recipes and then...
 			FILTER RECIPES by main ingredients
