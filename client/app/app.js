@@ -117,7 +117,7 @@ angular.module('mainCtrls', ['BarServices'])
   };
 
   $scope.isRoot = function() {
-    var userName = Auth.currentUser().toString();
+    var userName = Auth.currentUser();
     if(userName !== "admin") {
       return false;
     } else if (userName === "admin") {
@@ -170,52 +170,67 @@ angular.module('mainCtrls', ['BarServices'])
       return false;
     }
   };
+  $scope.isRoot = function() {
+    var userName = Auth.currentUser();
+    if(userName !== "admin") {
+      return false;
+    } else if (userName === "admin") {
+      return true;
+    }
+  };
   $scope.logout = function() {
     console.log('CLICK LOGOUT');
     Auth.removeToken();
   }  
 }])
 
-.controller('addCtrl', ['$scope', '$http', '$location', function($scope, $http, $location, AllData) {
+.controller('addCtrl', ['$scope', '$http', '$location', 'Auth', function($scope, $http, $location, Auth) {
 	console.log('ADD DRINK CONTROLLER');
-
-  $scope.drink = {
-    title: '',
-    description: '',
-    img: '',
-    extra: '',
-    ingredients: {
-      alcohol : {
-        whiskey: '',
-        gin: '',
-        vodka: '',
-        rum: '',
-        tequila: '',
-        scotch: ''
-      },
-    mixer : {
-        clubSoda: '',
-        tonic: '',
-        cola: '',
-        gingerAle: '',
-        orangeJuice: '',
-        cranberry: ''
+  if(!Auth.currentUser()) {
+      $location.path('/');
+  } else {
+    console.log('else');
+    $scope.drink = {
+      title: '',
+      description: '',
+      img: '',
+      extra: '',
+      ingredients: {
+        alcohol : {
+          whiskey: '',
+          gin: '',
+          vodka: '',
+          rum: '',
+          tequila: '',
+          scotch: ''
+        },
+      mixer : {
+          clubSoda: '',
+          tonic: '',
+          cola: '',
+          gingerAle: '',
+          orangeJuice: '',
+          cranberry: ''
       }
     }
   };
-
   $scope.addDrink = function() {
     console.log('Add drink into database');
     console.log($scope.drink);
     $http.post('/drinks', $scope.drink);
     $location.path('/drinkMenu');
   }
+  }
 
 }])
 
 
-.controller('favoritesCtrl', ['$scope', function($scope) {
-  console.log('INSIDE FAV CONTROLLER');
+.controller('favoritesCtrl', ['$scope', 'Auth', '$location', function($scope, Auth, $location) {
+  if(!Auth.currentUser()) {
+      $location.path('/');
+  } else {
+    console.log('INSIDE FAV CONTROLLER');
+  }
 }])
 
 
