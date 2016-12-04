@@ -19,7 +19,7 @@ angular.module('BarServices', ['ngResource'])
 				var token = this.getToken();
 				try {
 					var payload = JSON.parse($window.atob(token.split('.')[1]));
-					return payload
+					return payload._doc.name
 				} catch(err) {
 					return false;
 				}
@@ -58,8 +58,3 @@ angular.module('BarServices', ['ngResource'])
 .factory('AllData', ['$resource', function($resource) {
 	return $resource('http://localhost:3000/getall');
 }])
-
-
-
-
-
