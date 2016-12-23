@@ -55,12 +55,9 @@ angular.module('mainCtrls', ['BarServices'])
   };
   $scope.userSignup = function() {
     $http.post('/api/users', $scope.user).then(function success(res) {
-      console.log(res);
       $http.post('/api/auth', $scope.user).then(function success(res) {
         Auth.saveToken(res.data.token);
         $location.path('/drinkMenu');
-        console.log($scope.user);
-        console.log(res);
       }, function error(res) {
         console.log(res);
       });
@@ -101,7 +98,6 @@ angular.module('mainCtrls', ['BarServices'])
 		socket.emit('news', $scope.test);
 	    // socket.emit('my other event', { my: 'data' });
 	};
-
 }])
 
 
@@ -142,12 +138,7 @@ angular.module('mainCtrls', ['BarServices'])
       RecipeId: id.drink._id,
       UserId: user
     };
-    $http.post('/api/users', $scope.user).then(function success(res) {
-      $http.post('/favs', $scope.favID);
-    }, function error(res) {
-      console.log(res);
-    })
-
+    $http.post('/favs', $scope.favID);
   };
 
   $scope.removeHTML = function(drink) {
@@ -205,12 +196,6 @@ angular.module('mainCtrls', ['BarServices'])
 }])
 
 .controller('addCtrl', ['$scope', '$http', '$location', 'Auth', function($scope, $http, $location, Auth) {
-	// console.log('ADD DRINK CONTROLLER');
- //  $scope.user = Auth.currentUser();
- //  if($scope.user !== 'admin') {
- //    $location.path('/');
- //  } else {
-    console.log('else');
     $scope.drink = {
       title: '',
       description: '',
@@ -255,7 +240,6 @@ angular.module('mainCtrls', ['BarServices'])
     $http.post('/favs/:id', {userId : $scope.user}).then(
       function success(resp){
         $scope.drinks = resp;
-        console.log($scope.drinks + "239!!!!");
       },function err (resp){
         console.log(resp);
       }

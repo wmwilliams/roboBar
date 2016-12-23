@@ -55,7 +55,7 @@ mongoose.connection.once('open', function(){
 			if(error) {
 				console.log(error);
 			} else {
-				console.log('Check for success?');
+				console.log('Successfully added favorite for '+ req.body.UserId);
 			}
 		})
 	});	
