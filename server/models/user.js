@@ -15,7 +15,7 @@ UserSchema.set('toJSON', {
       id: ret._id,
       email: ret.email,
       name: ret.name
-      // favorites: ret.favorites
+      favorites: ret.favorites
     };
     return returnJson;
   }
