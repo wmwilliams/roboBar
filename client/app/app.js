@@ -55,16 +55,17 @@ angular.module('mainCtrls', ['BarServices'])
   };
   $scope.userSignup = function() {
     $http.post('/api/users', $scope.user).then(function success(res) {
+      console.log(res);
       $http.post('/api/auth', $scope.user).then(function success(res) {
         Auth.saveToken(res.data.token);
-        console.log(res.data.token);
-        console.log(Auth.isLoggedIn());
         $location.path('/drinkMenu');
+        console.log($scope.user);
+        console.log(res);
       }, function error(res) {
-        console.log(data);
+        console.log(res);
       });
     }, function error(res) {
-      console.log(data);
+      console.log(res);
     });
   }
   $scope.toggleModal1 = function() {
@@ -74,8 +75,6 @@ angular.module('mainCtrls', ['BarServices'])
     $http.post('/api/auth', $scope.user).then(function success(res) {
       Auth.saveToken(res.data.token);
       if(res.data.token) {
-        console.log(res.data.token);
-        console.log(Auth.isLoggedIn());
         $location.path('/drinkMenu');
       } else {
         console.log('failure');
@@ -107,7 +106,9 @@ angular.module('mainCtrls', ['BarServices'])
 
 
 .controller('menuCtrl', ['$scope', 'AllData', 'Auth', 'Alerts', '$http', '$location', '$window', '$route', function($scope, AllData, Auth, Alerts, $http, $location, $window, $route) {
+  var socket = io.connect();
   $scope.drinkMenu = {};
+
   $scope.isLoggedIn = function() {
     if(Auth.isLoggedIn()) {
       return true;
@@ -117,7 +118,8 @@ angular.module('mainCtrls', ['BarServices'])
   };
 
   $scope.isRoot = function() {
-    var userName = Auth.currentUser();
+    var user = Auth.currentUser();
+    if(user) var userName = user._doc.name;
     if(userName !== "admin") {
       return false;
     } else if (userName === "admin") {
@@ -131,13 +133,40 @@ angular.module('mainCtrls', ['BarServices'])
     $scope.selectedDrink = this.drink.ingredients;
     socket.emit('drink', $scope.selectedDrink)
   };
+  
+  $scope.addFav = function(id) {
+    $scope.user = Auth.currentUser();
+    console.log(id.drink._id);
+    var user = Auth.currentUser()._doc._id;
+    $scope.favID = {
+      RecipeId: id.drink._id,
+      UserId: user
+    };
+    $http.post('/api/users', $scope.user).then(function success(res) {
+      $http.post('/favs', $scope.favID);
+    }, function error(res) {
+      console.log(res);
+    })
+
+  };
+
+  $scope.removeHTML = function(drink) {
+    console.log(drink);
+    for(var i = 0;i < $scope.drinkMenu.length; i++) {
+      if($scope.drinkMenu[i]._id === drink.id){
+        $scope.drinkMenu.splice(i,1)
+      } else {
+        console.log("Not this one "+ $scope.drinkMenu[i]._id)
+      }
+    };
+  };
+
   $scope.deleteDrink = function(id) {
     drinkId = {
       id: id.drink._id.toString()
     }
-    console.log(drinkId.id + " HEREEEEEEEEE");
     $http.post('/drinks/:id', { data : drinkId.id});
-    $route.reload();
+    $scope.removeHTML(drinkId);
   };
 
   AllData.get(
@@ -148,21 +177,11 @@ angular.module('mainCtrls', ['BarServices'])
       console.log(data);
     }
   );
-  //Begin socket connection to back-end
-  var socket = io.connect();
-	$scope.test = 'TEST';
-	//Socket test, this should console log a message in terminal (backend)
-	$scope.buttonClick = function (event) {
-		console.log('CLICK');
-		socket.emit('news', $scope.test);
-	    // socket.emit('my other event', { my: 'data' });
-	};
 
 }])
 
 
 .controller('NavCtrl', ['$scope', 'Auth', 'Alerts', function($scope, Auth, Alerts) {
-
   $scope.isLoggedIn = function() {
     if(Auth.currentUser()) {
       return true;
@@ -171,7 +190,8 @@ angular.module('mainCtrls', ['BarServices'])
     }
   };
   $scope.isRoot = function() {
-    var userName = Auth.currentUser();
+    var user = Auth.currentUser();
+    if(user) var userName = user._doc.name;
     if(userName !== "admin") {
       return false;
     } else if (userName === "admin") {
@@ -185,10 +205,11 @@ angular.module('mainCtrls', ['BarServices'])
 }])
 
 .controller('addCtrl', ['$scope', '$http', '$location', 'Auth', function($scope, $http, $location, Auth) {
-	console.log('ADD DRINK CONTROLLER');
-  if(!Auth.currentUser()) {
-      $location.path('/');
-  } else {
+	// console.log('ADD DRINK CONTROLLER');
+ //  $scope.user = Auth.currentUser();
+ //  if($scope.user !== 'admin') {
+ //    $location.path('/');
+ //  } else {
     console.log('else');
     $scope.drink = {
       title: '',
@@ -204,32 +225,59 @@ angular.module('mainCtrls', ['BarServices'])
           tequila: '',
           scotch: ''
         },
-      mixer : {
+        mixer : {
           clubSoda: '',
           tonic: '',
           cola: '',
           gingerAle: '',
           orangeJuice: '',
           cranberry: ''
+        }
       }
+    };
+    $scope.addDrink = function() {
+      $http.post('/drinks', $scope.drink);
+      $location.path('/drinkMenu');
     }
-  };
-  $scope.addDrink = function() {
-    console.log('Add drink into database');
-    console.log($scope.drink);
-    $http.post('/drinks', $scope.drink);
-    $location.path('/drinkMenu');
-  }
-  }
+  // }
 
 }])
 
 
-.controller('favoritesCtrl', ['$scope', 'Auth', '$location', function($scope, Auth, $location) {
+.controller('favoritesCtrl', ['$scope', 'Auth', '$location', '$http', function($scope, Auth, $location, $http) {
   if(!Auth.currentUser()) {
       $location.path('/');
   } else {
+    $scope.user = Auth.currentUser()._doc._id;
+    var socket = io.connect();
+
+
+    $http.post('/favs/:id', {userId : $scope.user}).then(
+      function success(resp){
+        $scope.drinks = resp;
+        console.log($scope.drinks + "239!!!!");
+      },function err (resp){
+        console.log(resp);
+      }
+    );
+
     console.log('INSIDE FAV CONTROLLER');
+
+    $scope.deleteDrink = function(id) {
+      drinkId = {
+        id: id.drink._id.toString()
+      }
+      $http.post('/drinks/:id', { data : drinkId.id});
+      $route.reload();
+    };
+
+    $scope.orderDrink = function() {
+      console.log(this.drink.ingredients)
+      console.log('DRINK IS BEING MADE');
+      $scope.selectedDrink = this.drink.ingredients;
+      socket.emit('drink', $scope.selectedDrink)
+    };
+
   }
 }])
 

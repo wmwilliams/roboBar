@@ -12,6 +12,13 @@ Readme File --Keep updated notes on
 		-admin user is needed for certain end routes
 		-added delete ability for recipes
 
+
+
+	12/4/2016
+		-Favorite db model and implementation
+
+
+
 		TODO: 
 			Improve landing page / modals
 			Finish routes/functions for user favorites and double functionality!

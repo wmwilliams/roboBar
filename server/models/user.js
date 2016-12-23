@@ -1,10 +1,12 @@
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt');
+// var Favorite = require('./favorites');
 
 var UserSchema = mongoose.Schema({
   name: String,
   email: String,
-  password: String
+  password: String,
+  favorites: Array
 });
 
 UserSchema.set('toJSON', {
@@ -13,6 +15,7 @@ UserSchema.set('toJSON', {
       id: ret._id,
       email: ret.email,
       name: ret.name
+      // favorites: ret.favorites
     };
     return returnJson;
   }
@@ -26,10 +29,11 @@ UserSchema.methods.authenticated = function(password, callback) {
       callback(null, res ? this : false);
     }
   });
-}
+};
 
 UserSchema.pre('save', function(next) {
   if (!this.isModified('password')) {
+    console.log('NEXT');
     next();
   } else {
     this.password = bcrypt.hashSync(this.password, 10);

@@ -6,7 +6,8 @@ module.exports = {
 
   Drinks: require('./drinks'),
   // Time: require('./times')
+  // Favorites: require('./favorites')
 
-
+  // Favorites: require('./favorites')
 
 };

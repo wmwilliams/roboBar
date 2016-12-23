@@ -16,10 +16,11 @@
 					<h5 ng-repeat='(key, value) in drink.ingredients.alcohol' ng-show={{value}}>{{key}} : {{value}} Part</h5>	
 					<h5 ng-repeat='(key, value) in drink.ingredients.mixer' ng-show={{value}}>{{key}} : {{value}} Part</h5>
 				</div>
-				<button ng-show="isLoggedIn()" class='btn btn-default' ng-click="isLoggedin()">Add to Favs</button>
-				<button ng-show="isRoot()" class='btn btn-default'>Edit Recipe</button>
-				<button ng-show="isRoot()" class='btn btn-default' ng-click='deleteDrink(this)'>Delete</button></br></br>
+				<button ng-show="isRoot()" class='btn btn-default' ng-click='deleteDrink(this)'>Delete</button>
+				<button ng-show="isLoggedIn()" class='btn btn-default' ng-click='addFav(this)'>Add to Favorites</button>
+				</br></br>
 				<button ng-show="isLoggedIn()" class='btn btn-lg btn-danger' ng-click='orderDrink()'>MAKE DRINK</button>
+				</br></br>
 			</div>
 		</div>
 	</div>
