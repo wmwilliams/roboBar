@@ -25,7 +25,12 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
         })        
         .when('/drinkMenu', {
             templateUrl: 'app/views/drinkMenu.html',
-            controller: 'menuCtrl'
+            controller: 'menuCtrl',
+            resolve: {
+              drinks: function(Drinks) {
+                return Drinks.get();
+            }
+        }
         })
         .when('/add', {
             templateUrl: 'app/views/add.html',
@@ -88,23 +93,30 @@ angular.module('mainCtrls', ['BarServices'])
 }])
 
 
-.controller('homeCtrl', ['$scope', function($scope) {
+.controller('homeCtrl', ['$scope', 'Auth', function($scope, Auth) {
 	//Begin socket connection to back-end
 	var socket = io.connect();
-	$scope.test = 'TEST';
-	//Socket test, this should console log a message in terminal (backend)
-	$scope.buttonClick = function (event) {
-		console.log('CLICK');
-		socket.emit('news', $scope.test);
-	    // socket.emit('my other event', { my: 'data' });
-	};
+
+  $scope.isRoot = function() {
+    var user = Auth.currentUser();
+    if(user) var userName = user._doc.name;
+      if(userName !== "admin") {
+        return false;
+      } else if (userName === "admin") {
+        return true;
+      }
+    }
 }])
 
 
-.controller('menuCtrl', ['$scope', 'AllData', 'Auth', 'Alerts', '$http', '$location', '$window', '$route', function($scope, AllData, Auth, Alerts, $http, $location, $window, $route) {
+.controller('menuCtrl', ['$scope', 'Auth', 'Alerts', '$http', '$location', '$window', '$route', 'Drinks', function($scope, Auth, Alerts, $http, $location, $window, $route, Drinks) {
   var socket = io.connect();
-  $scope.drinkMenu = {};
 
+  Drinks.get().$promise.then(function(data){
+   $scope.drinkMenu = data.drinks;
+  });
+  // console.log(Auth.currentUser());
+  // console.log(Auth.getToken());
   $scope.isLoggedIn = function() {
     if(Auth.isLoggedIn()) {
       return true;
@@ -131,11 +143,11 @@ angular.module('mainCtrls', ['BarServices'])
   };
   
   $scope.addFav = function(id) {
-    $scope.user = Auth.currentUser();
+    // $scope.user = Auth.currentUser();
     console.log(id.drink._id);
     var user = Auth.currentUser()._doc._id;
     $scope.favID = {
-      RecipeId: id.drink._id,
+      Recipe: id.drink._id,
       UserId: user
     };
     $http.post('/favs', $scope.favID);
@@ -153,28 +165,26 @@ angular.module('mainCtrls', ['BarServices'])
   };
 
   $scope.deleteDrink = function(id) {
-    drinkId = {
+    var   drinkId = {
       id: id.drink._id.toString()
-    }
-    $http.post('/drinks/:id', { data : drinkId.id});
+    };
+    $http.delete('/drinks/' + id.drink._id.toString()) 
+    .success(function (data, status, headers) {
+        console.log('------------------------SUCCESS----------------------');
+        console.log(data);
+    })
+    .error(function (data, status, header, config) {
+        console.log(data);
+    });
     $scope.removeHTML(drinkId);
   };
-
-  AllData.get(
-    function success(data, stuff) {
-      $scope.drinkMenu = data.drinks;
-    },
-    function error(data) {
-      console.log(data);
-    }
-  );
 
 }])
 
 
 .controller('NavCtrl', ['$scope', 'Auth', 'Alerts', function($scope, Auth, Alerts) {
   $scope.isLoggedIn = function() {
-    if(Auth.currentUser()) {
+    if(Auth.isLoggedIn()) {
       return true;
     } else {
       return false;
@@ -195,7 +205,7 @@ angular.module('mainCtrls', ['BarServices'])
   }  
 }])
 
-.controller('addCtrl', ['$scope', '$http', '$location', 'Auth', function($scope, $http, $location, Auth) {
+.controller('addCtrl', ['$scope', '$http', '$location', 'Auth', 'Drinks', function($scope, $http, $location, Auth, Drinks) {
     $scope.drink = {
       title: '',
       description: '',
@@ -221,54 +231,90 @@ angular.module('mainCtrls', ['BarServices'])
       }
     };
     $scope.addDrink = function() {
-      $http.post('/drinks', $scope.drink);
-      $location.path('/drinkMenu');
+
+      $scope.newDrink = new Drinks();
+      $scope.newDrink.data = $scope.drink;
+    
+      $scope.newDrink.$save(function(success, err) {
+        if(err) console.log(err);
+        else $location.path('/drinkMenu');
+      })
     }
-  // }
 
 }])
 
 
-.controller('favoritesCtrl', ['$scope', 'Auth', '$location', '$http', function($scope, Auth, $location, $http) {
-  if(!Auth.currentUser()) {
-      $location.path('/');
-  } else {
-    $scope.user = Auth.currentUser()._doc._id;
-    var socket = io.connect();
+.controller('favoritesCtrl', ['$scope', 'Auth', '$location', '$http', 'Drinks', function($scope, Auth, $location, $http, Drinks) {
 
+  var socket = io.connect();
+  console.log(JSON.stringify($scope.favorites));
+  $scope.favorites = Auth.currentUser()._doc.favorites;
+  $scope.results = [];
 
-    $http.post('/favs/:id', {userId : $scope.user}).then(
-      function success(resp){
-        $scope.drinks = resp;
-      },function err (resp){
-        console.log(resp);
+    $scope.isLoggedIn = function() {
+    if(Auth.isLoggedIn()) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  $scope.isRoot = function() {
+    var user = Auth.currentUser();
+    if(user) var userName = user._doc.name;
+    if(userName !== "admin") {
+      return false;
+    } else if (userName === "admin") {
+      return true;
+    }
+  };
+
+  function getResults(id) {
+    $http({
+      method: 'GET',
+      url: "/drinks/" + id
+    })
+    .then(function(response) {
+      $scope.results.push(response);
+      console.log(response);
+      console.log($scope.results);
+      return response;
+    });
+  };
+  function makeCall(array) {
+    console.log('test');
+    for(var i = 0; i < array.length; i++) {
+      getResults(array[i]);
+      console.log(array[i]);
+    }
+  };
+ makeCall($scope.favorites);
+
+  
+
+  $scope.orderDrink = function() {
+    console.log(this.drink.ingredients)
+    console.log('DRINK IS BEING MADE');
+    $scope.selectedDrink = this.drink.ingredients;
+    socket.emit('drink', $scope.selectedDrink)
+  };
+  
+  $scope.removeHTML = function(drink) {
+    console.log(drink);
+    for(var i = 0;i < $scope.drinkMenu.length; i++) {
+      if($scope.drinkMenu[i]._id === drink.id){
+        $scope.drinkMenu.splice(i,1)
+      } else {
+        console.log("Not this one "+ $scope.drinkMenu[i]._id)
       }
-    );
-
-    console.log('INSIDE FAV CONTROLLER');
-
-    $scope.deleteDrink = function(id) {
-      drinkId = {
-        id: id.drink._id.toString()
-      }
-      $http.post('/drinks/:id', { data : drinkId.id});
-      $route.reload();
     };
+  };
 
-    $scope.orderDrink = function() {
-      console.log(this.drink.ingredients)
-      console.log('DRINK IS BEING MADE');
-      $scope.selectedDrink = this.drink.ingredients;
-      socket.emit('drink', $scope.selectedDrink)
+  $scope.deleteDrink = function(id) {
+    var   drinkId = {
+      id: id.drink._id.toString()
     };
-
-  }
+    //REMOVE FROM USER FAVORITES ARRAY
+    $scope.removeHTML(drinkId);
+  };
 }])
-
-
-
-
-
-
-
-

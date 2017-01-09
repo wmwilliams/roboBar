@@ -6,9 +6,15 @@ var favData = {};
 
 
 router.get('/', function(req, res){
-	db.Favorites.find({}, function(err, data){
+	console.log(req.body);
+	console.log("Line9 getFavs.js");
+	db.Drinks.find({
+		_id : {
+			$in : req.body.id
+		}
+	}, function(err, data){
 		if(err) console.log(err);
-		totalData.drinks = data;
+		favData.drinks = data;
 		res.send(favData);
 	});
 })

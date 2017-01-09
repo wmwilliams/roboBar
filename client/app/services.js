@@ -21,7 +21,7 @@ angular.module('BarServices', ['ngResource'])
 					var payload = JSON.parse($window.atob(token.split('.')[1]));
 					return payload
 				} catch(err) {
-					return false;
+					return err;
 				}
 			}
 		}
@@ -55,9 +55,26 @@ angular.module('BarServices', ['ngResource'])
 		}
 	}
 }])
-.factory('AllData', ['$resource', function($resource) {
-	return $resource('http://localhost:3000/getall');
-}])
-// .factory('FavData', ['$resource', function($resource) {
-// 	return $resource('http://localhost:3000/getFavs');
-// }])
+
+.factory("Drinks", function($http, $resource) {
+	return $resource('/drinks/:id', {}, {
+		query: { method: "GET", isArray: false },
+        create: { method: "POST"},
+        get: { method: "GET"},
+        remove: { method: "DELETE"},
+        update: { method: "PUT"}
+	});
+})
+
+
+
+
+
+
+
+
+
+
+
+
+

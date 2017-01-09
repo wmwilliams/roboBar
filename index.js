@@ -34,6 +34,11 @@ mongoose.connection.once('open', function(){
 		  res.status(401).send({message: 'You need an authorization token to view this information.'})
 		}
 	});
+//Database routes
+	function handleError(res, reason, message, code) {
+		console.log("ERROR: " + reason);
+		res.status(code || 500).json({"error": message});
+	};
 	
 	app.post('/api/auth', function(req, res) {
 		console.log('node Auth Post');
@@ -44,29 +49,48 @@ mongoose.connection.once('open', function(){
 		    newUser = true;
 		    var token = jwt.sign(user, secret);
 		    tokenName = user.name;
+		    console.log({user: user, token: token});
 		    res.send({user: user, token: token});
 		  });
 		});
 	});
-	//Add new favorite
-	app.post('/favs', function(req, res){
-		console.log(req.body.UserId);
-		User.findOneAndUpdate({"_id" : req.body.UserId}, {$addToSet : {favorites : req.body.RecipeId}}, {safe: true, upsert: true}, function(error, model) {
-			if(error) {
-				console.log(error);
-			} else {
-				console.log('Successfully added favorite for '+ req.body.UserId);
-			}
-		})
-	});	
-	//Delete favorite by ID
-	app.post('/favs/:id', function(req, res){
-		console.log()
-		console.log(req.body.id)
+
+	app.get('/drinks', function(req, res) {
+		var totalData = {};
+		Recipe.find({}, function(err, data){
+			if(err) console.log(err);
+			totalData.drinks = data;
+			// console.log(data + "INDEXjs ROUTE");
+			res.send(totalData);
+		});
 	});
-	//Add new drink data to DB
+
 	app.post('/drinks', function(req, res) {
-		// console.log(req.body)
+		console.log(req.body.data);
+		var newDrink = Recipe({
+			title: req.body.data.title,
+			description: req.body.data.description,
+			img: req.body.data.img,
+			extra: req.body.data.extra,
+			ingredients: req.body.data.ingredients
+		});
+		newDrink.save(function(err) {
+			if(err) console.log(err);
+		})
+	});
+
+	app.get('/drinks/:id', function(req, res) {
+		var totalData = {};
+		console.log(req.params.id);
+		Recipe.findOne({_id : req.params.id}, function(err, data) {
+			if(err) console.log(err);
+			totalData.drinks = data;
+			res.send(totalData);
+			console.log(totalData);
+		})
+	});
+
+	app.put('/drinks/:id', function(req, res) {
 		var newDrink = Recipe({
 			title: req.body.title,
 			description: req.body.description,
@@ -74,34 +98,88 @@ mongoose.connection.once('open', function(){
 			extra: req.body.extra,
 			ingredients: req.body.ingredients
 		});
-		newDrink.save(function(err) {
-			if(err) console.log(err);
-		})
-	});
-	//THIS IS A DELETE ROUTE --FUCK YOU ANGULAR FOR NOT LETTING OBJECTS BE SENT FOR DELETE ROUTES
-	app.post('/drinks/:id', function(req, res) {
-		Recipe.findByIdAndRemove({_id : req.body.data}, function(err, recipe) {
-			if(err || !recipe) console.log(err);
-			console.log("Recipe deleted successfully.");
+		Recipe.updateOne({_id : req.params.id}, newDrink,function(err, data) {
+			if (err) {
+				handleError(res, err.message, "Failed to update contact");
+			} else {
+				console.log(data);
+				res.status(204).end();
+			}
 		})
 	});
 
+	app.delete('/drinks/:id', function(req, res) {	
+		console.log('DELETE '+ req.params.id);
+		Recipe.findByIdAndRemove({_id : req.params.id}, function(err, recipe) {
+			if(err || !recipe) console.log(err);
+			console.log("Recipe deleted successfully.");
+		})	
+	});
+
+	var isBusy = false;
 	io.sockets.on('connection', function(socket){
 	  	console.log('SOCKETS CONNECTED');
 
-		socket.on('news', function (data) {
-		    console.log(data);
-	  	});
 	  	socket.on('drink', function(data) {
-	  		// console.log(data);
-	  		makeDrink(data);
+	  		if(isBusy) {
+	  			console.log('DRINK ROBOT IS BUSY');
+	  		}
+	  		else { makeCalculation(data); }
 	  	})
 
 	});
-	makeDrink = function(data) {
-		console.log(data);
-		console.log('Server making drink function');
+
+	makeCalculation = function(data) {
+		isBusy = true;
+		console.log('Server making drink function ' + isBusy);
+		var alcoholTotal = 0;
+		var mixerTotal = 0;
+		var ingRates = {};
+		for(var stuff in data.alcohol) {
+			if(data.alcohol[stuff]) {
+				alcoholTotal = alcoholTotal + data.alcohol[stuff];
+				ingRates[stuff] = data.alcohol[stuff];
+			}
+		};	
+
+		for(var stuff in data.mixer) {
+			if(data.mixer[stuff]) {
+				mixerTotal = mixerTotal + data.mixer[stuff];
+				ingRates[stuff] = data.mixer[stuff];
+			}
+		};
+		if(mixerTotal) {
+			var liquidTotal = alcoholTotal + mixerTotal;
+		} else {
+			var liquidTotal = alcoholTotal;
+		};
+		ingRates.rate = 90000 / liquidTotal;
+		makeDrink(ingRates);
 	};
+
+	makeDrink = function(drink) {
+		console.log(drink);
+
+		var rate = drink.rate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	};
+
 
 	var routes = require('./server/routes');
 	_.each(routes, function(controller, route) {

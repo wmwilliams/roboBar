@@ -3,9 +3,10 @@
 <div ng-controller='UserCtrl'>
   <div class='button-row container-fluid'>
     <div class='col-md-6 col-md-offset-3'>
-      <button ng-click='toggleModal()' class='btn btn-default col-md-4 col-sm-4'>Login</button>
-      <a class='btn btn-default col-md-4 col-sm-4' href="/drinkMenu">Continue as Guest</a>
-      <button ng-click='toggleModal1()' class='btn btn-default col-md-4 col-sm-4'>Sign up</button>
+      <button ng-click='toggleModal()' class='btn btn-default col-md-6 col-sm-6'>Login</button>
+      <a class='btn btn-default col-md-6 col-sm-6' href="/drinkMenu">Continue as Guest</a>
+      </br></br>
+      <button ng-click='toggleModal1()' ng-show="isRoot()" class='btn btn-default col-md-12 col-sm-12'>Sign up</button>
     </div>
   </div>
 
