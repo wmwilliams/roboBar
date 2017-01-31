@@ -1,0 +1,50 @@
+<div class="col-xs-12" style="height:70px;"></div>
+
+
+<div class="container-fluid" >
+  <div class='text-center'>
+    <h1 class='text-center'>REPORTS REPORTS REPORTS</h1>
+  </div>
+</div>
+
+<div class='col-md-5 col-md-offset-1 col-sm-10 col-sm-offset-1'>
+  <div class="col-xs-12" style="height:70px;"></div>
+  <div>
+    <canvas id="bar" class="chart chart-bar"
+    chart-data="data" chart-labels="labels" chart-series="series">
+    </canvas>
+  </div>
+
+  <div class='dropdown'>
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select a User<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><button ng-click="totalData()">Total drinks made</button></li>
+      <li ng-repeat="user in users"><button ng-click="changedValue(this)">{{user.name}}</button></li>
+    </ul>
+  </div>
+  
+  <div class="col-xs-12" style="height:10px;"></div>
+
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Clear Records<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><button ng-click="clearReports()">Total drink reports</button></li>
+      <li ng-repeat="user in users"><button ng-click="clearReports(this)">{{user.name}}</button></li>
+    </ul>
+  </div>
+</div>
+
+<div class='col-md-5 col-md-offset-1 col-sm-10 col-sm-offset-1'>
+  <div class="col-xs-12" style="height:70px;"></div>
+  <div>
+    <canvas id="bar" class="chart chart-bar"
+    chart-data="liquidData" chart-labels="liquidLabels" chart-series="liquidSeries">
+    </canvas>
+  </div>
+  <div class='dropdown'>
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select an ingredient to refill<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+       <li ng-repeat="label in liquidLabels"><button ng-click="refillIngredient(this.label)">{{label}}</button></li>
+    </ul>
+  </div>
+</div>

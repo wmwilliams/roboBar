@@ -1,3 +1,5 @@
+<div class="col-xs-12" style="height:70px;"></div>
+
 <h1 class='text-center'>This will be user specific favorite page</h1>
 
 
@@ -5,18 +7,18 @@
 	<div class='row'>
 		<div id='drinkRecipe' class='text-center col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1 col-sm-12 col-xs-12'>
 			<div ng-repeat="drink in results" class='col-md-6 col-lg-6 col-sm-10 col-xs-10'>
-				<img style="height:200px;"src={{drink.data.drinks.img}}>
-				<h2>{{drink.data.drinks.title}}</h2>
-				<p>{{drink.data.drinks.description}}</p>
-				<p>{{drink.data.drinks.extra}}</p>
+				<img style="height:200px;"src={{drink.drink.img}}>
+				<h2>{{drink.drink.title}}</h2>
+				<p>{{drink.drink.description}}</p>
+				<p>{{drink.drink.extra}}</p>
 				<div>
 					<h3>Ingredients</h3>
-					<h5 ng-repeat='(key, value) in drink.data.drinks.ingredients.alcohol' ng-show={{value}}>{{key}} : {{value}} Part</h5>	
-					<h5 ng-repeat='(key, value) in drink.data.drinks.ingredients.mixer' ng-show={{value}}>{{key}} : {{value}} Part</h5>
+					<h5 ng-repeat='(key, value) in drink.drink.ingredients.alcohol' ng-show={{value}}>{{key}} : {{value}} Part</h5>
+					<h5 ng-repeat='(key, value) in drink.drink.ingredients.mixer' ng-show={{value}}>{{key}} : {{value}} Part</h5>
 				</div>
 				<button ng-show="isLoggedIn()" class='btn btn-default' ng-click="removeFav(this)">Remove From Favs</button>
-				<button ng-show="isRoot()" class='btn btn-default'>Edit Recipe</button>
-				<button ng-show="isLoggedIn()" class='btn btn-lg btn-danger' ng-click='orderDrink()'>MAKE DRINK</button>
+				<!-- <button ng-show="isRoot()" class='btn btn-default'>Edit Recipe</button> -->
+				<button ng-show="isLoggedIn()" class='btn btn-danger' ng-click='orderDrink()'>MAKE DRINK</button>
 			</div>
 		</div>
 	</div>

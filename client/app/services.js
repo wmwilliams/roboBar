@@ -57,24 +57,13 @@ angular.module('BarServices', ['ngResource'])
 }])
 
 .factory("Drinks", function($http, $resource) {
-	return $resource('/drinks/:id', {}, {
-		query: { method: "GET", isArray: false },
-        create: { method: "POST"},
-        get: { method: "GET"},
-        remove: { method: "DELETE"},
-        update: { method: "PUT"}
-	});
+	return $resource('/drinks/', {}, {
+		query: { method: "GET", isArray: false }
+	})
+// 		// ,
+//     // create: { method: "POST"},
+//     // get: { method: "GET"},
+//     // remove: { method: "DELETE"},
+//     // update: { method: "PUT"}
+	// });
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
