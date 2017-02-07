@@ -7,13 +7,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/#/">RoboBar</a>
+      <a class="navbar-brand" href="/#/drinkMenu">RoboBar</a>
     </div>
+    <flash-message duration="3000" class='text-center navbar-fixed-top' style="width:50%; margin: auto;"></flash-message>
     <div class="navbar-collapse" uib-collapse='collapsed'>
       <ul class="nav navbar-nav navbar-right">
-        <li><a class='btn btn-default' href="/#/">Home</a></li>        
+        <li><a class='btn btn-default' href="/#/">Home</a></li>
         <li><a class='btn btn-default' href="/#/drinkMenu">Menu</a></li>
         <li><a class='btn btn-default' href="/#/add" ng-show='isRoot()'>Add</a></li>
+        <li><a class='btn btn-default' href="/#/reports" ng-show='isRoot()'>Reports</a></li>
         <li><a class='btn btn-default' href='/#/favorites' ng-show="isLoggedIn()">Favorites</a></li>
         <li><a class='btn btn-default' href='/#/' ng-show="isLoggedIn()" ng-click='logout()'>Logout</a></li>
       </ul>
