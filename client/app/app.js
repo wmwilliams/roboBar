@@ -479,7 +479,7 @@ angular.module('mainCtrls', ['BarServices'])
   		if($scope.results[i]._id === drink.id){
   			$scope.results.splice(i,1)
   		} else {
-  			console.log("Not this one "+ $scope.drinkMenu[i]._id)
+  			console.log("Not this one "+ $scope.results[i]._id)
   		}
   	};
   };
