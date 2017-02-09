@@ -35,7 +35,7 @@ angular.module('mainCtrls', ['BarServices'])
 .controller('ModalController', function($scope, close) {
 
     $scope.close = function(result) {
-      close(result, 500); // close, but give 500ms for bootstrap to animate
+      close(result, 500);
     }
 })
 .controller('userCtrl', ['$scope', '$timeout', '$http', '$location', 'Alerts', 'Auth', '$rootScope', 'Flash', 'ModalService', function($scope, $timeout, $http, $location, Alerts, Auth, $rootScope, Flash, ModalService) {
@@ -124,7 +124,10 @@ angular.module('mainCtrls', ['BarServices'])
 }])
 .controller('menuCtrl', ['$scope', 'Auth', 'Alerts', '$http', '$location', '$window', '$route', 'Drinks', '$rootScope', 'Flash', 'ModalService', function($scope, Auth, Alerts, $http, $location, $window, $route, Drinks, $rootScope, Flash, ModalService) {
   var socket = io.connect();
-
+  $scope.message = {
+    title: "",
+    body: ""
+  };
   Drinks.get().$promise.then(function(data){
    $scope.drinkMenu = data.drinks;
   })
@@ -135,25 +138,40 @@ angular.module('mainCtrls', ['BarServices'])
       return false;
     }
   };
-  $scope.orderSuccess = function() {
-    var message = '<strong>Success!</strong> Your drink should be on the way soon.';
-    Flash.create('orderSuccess', message);
+
+  $scope.show = function(template) {
+      ModalService.showModal({
+          templateUrl: template,
+          controller: "ModalController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function() {
+            return;
+          });
+      });
   };
+  function orderSuccess() {
+    $scope.show('orderSuccess.html');
+  };
+  function orderFailure() {
+    $scope.show('orderFailure.html');
+  };
+
   $scope.favSuccess = function(drink) {
     var message = '<strong>Success!</strong> '+ drink +' was added to your personal list.';
-    Flash.create('orderSuccess', message);
+    Flash.create('favSuccess', message);
   };
   $scope.favFailure = function(drink) {
     var message = '<strong>Failure!</strong> '+ drink +' was NOT added to your favorites list.';
-    Flash.create('orderSuccess', message);
+    Flash.create('favFailure', message);
   };
   $scope.deleteSuccess = function(drink) {
     var message = '<strong>Success!</strong> '+ drink +' was successfully deleted from the menu.';
-    Flash.create('orderSuccess', message);
+    Flash.create('deleteSuccess', message);
   };
   $scope.deleteFailure = function(drink) {
     var message = '<strong>FAILURE!</strong> '+ drink +' was not deleted from the menu.';
-    Flash.create('orderSuccess', message);
+    Flash.create('deleteFailure', message);
   };
   $scope.isRoot = function() {
     var user = Auth.currentUser();
@@ -165,16 +183,30 @@ angular.module('mainCtrls', ['BarServices'])
     }
   };
 
-  $scope.orderDrink = function() {
-    console.log(this.drink.ingredients)
-    console.log('DRINK IS BEING MADE');
+  $scope.orderDrink = function () {
     $scope.selectedDrink = {
       drink : this.drink.ingredients,
       title : this.drink.title,
       user : Auth.currentUser()._doc._id
     };
-    socket.emit('drink', $scope.selectedDrink)
-    $scope.orderSuccess();
+    socket.emit('drink', $scope.selectedDrink);
+  };
+
+  socket.on('message', function(data) {
+    readMessage(data);
+  });
+
+  function readMessage(info) {
+    console.log(info);
+    if(info.message.toString() === "failure") {
+      console.log("Failure");
+      orderFailure();
+    } else if(info.message.toString() === "success"){
+      console.log("Success");
+      orderSuccess();
+    } else {
+      console.log(info.message.toString());
+    };
   };
 
   $scope.addFav = function(id) {
@@ -404,6 +436,10 @@ angular.module('mainCtrls', ['BarServices'])
   	var message = '<strong>Success!</strong> Your drink should be on the way soon.';
   	Flash.create('orderSuccess', message);
   };
+  $scope.orderFailure = function() {
+  	var message = '<strong>Failure!</strong> Wait a minute or two and try again, robot is making someone elses drink!';
+  	Flash.create('orderSuccess', message);
+  };
   $scope.isRoot = function() {
     var user = Auth.currentUser();
     if(user) var userName = user._doc.name;
@@ -418,6 +454,14 @@ angular.module('mainCtrls', ['BarServices'])
       $scope.results = response.data.drinks;
   });
 
+  // socket.on('fail', function(){
+  //   $scope.orderFailure();
+  // })
+  // socket.on('success', function(){
+  //   console.log('success function');
+  //   $scope.orderSuccess();
+  // })
+
   $scope.orderDrink = function() {
     console.log(this.drink.ingredients)
     console.log('DRINK IS BEING MADE');
@@ -427,7 +471,7 @@ angular.module('mainCtrls', ['BarServices'])
       user : Auth.currentUser()._doc._id
     };
     socket.emit('drink', $scope.selectedDrink)
-    $scope.orderSuccess();
+    // $scope.orderSuccess();
   }
   $scope.removeHTML = function(drink) {
     console.log(drink)

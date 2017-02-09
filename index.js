@@ -220,19 +220,21 @@ mongoose.connection.once('open', function(){
 		io.sockets.on('connection', function(socket){
 		  	console.log('SOCKETS CONNECTED')
 		  	socket.on('drink', function(data) {
-					var isBusy = checkPins();
-					if(isBusy) {
-						console.log('IM BUSY MOTHERFUCKER FUCK OFF')
-					} else if(!isBusy)
+					console.log(checkPins());
+					if(checkPins()) {
+						socket.emit('message', {message : "failure"});
+					} else if(!checkPins()) {
+						socket.emit('message', {message : "success"});
 						makeCalculation(data);
+					}
 				});
 		});
 
 		function checkPins() {
-			console.log(board.pins[13]);
 			var isbusy;
 			for(var i = 0; i < board.pins.length; i++) {
 				if('value' in board.pins[i]) {
+					// console.log(board.pins[i].value)
 					if(board.pins[i].value === 1) {
 						isbusy = true;
 						break;
@@ -241,8 +243,7 @@ mongoose.connection.once('open', function(){
 					}
 				}
 			}
-			console.log(isbusy);
-			return isbusy;
+			return isbusy
 		};
 
 		function makeCalculation(data) {

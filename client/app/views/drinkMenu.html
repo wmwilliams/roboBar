@@ -22,3 +22,35 @@
 		</div>
 	</div>
 </div>
+
+
+<script type="text/ng-template" id="orderSuccess.html">
+  <div class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content text-center">
+        <div class="text-center">
+          <h1>Success</h1></br>
+          <p>Your drink is being made, enjoy!</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/ng-template" id="orderFailure.html">
+  <div class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content text-center">
+        <div class="text-center">
+          <h1>Failure</h1></br>
+          <p>Please try again in a few minutes, the bartender is currently busy!</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
