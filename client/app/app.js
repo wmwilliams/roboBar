@@ -138,6 +138,7 @@ angular.module('mainCtrls', ['BarServices'])
       return false;
     }
   };
+<<<<<<< HEAD
 
   $scope.show = function(template) {
       ModalService.showModal({
@@ -172,6 +173,27 @@ angular.module('mainCtrls', ['BarServices'])
   $scope.deleteFailure = function(drink) {
     var message = '<strong>FAILURE!</strong> '+ drink +' was not deleted from the menu.';
     Flash.create('deleteFailure', message);
+=======
+  $scope.orderSuccess = function() {
+    var message = '<strong>Success!</strong> Your drink should be on the way soon.';
+    Flash.create('orderSuccess', message);
+  };
+  $scope.favSuccess = function(drink) {
+    var message = '<strong>Success!</strong> '+ drink +' was added to your personal list.';
+    Flash.create('orderSuccess', message);
+  };
+  $scope.favFailure = function(drink) {
+    var message = '<strong>Failure!</strong> '+ drink +' was NOT added to your favorites list.';
+    Flash.create('orderSuccess', message);
+  };
+  $scope.deleteSuccess = function(drink) {
+    var message = '<strong>Success!</strong> '+ drink +' was successfully deleted from the menu.';
+    Flash.create('orderSuccess', message);
+  };
+  $scope.deleteFailure = function(drink) {
+    var message = '<strong>FAILURE!</strong> '+ drink +' was not deleted from the menu.';
+    Flash.create('orderSuccess', message);
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
   };
   $scope.isRoot = function() {
     var user = Auth.currentUser();
@@ -183,12 +205,19 @@ angular.module('mainCtrls', ['BarServices'])
     }
   };
 
+<<<<<<< HEAD
   $scope.orderDrink = function () {
+=======
+  $scope.orderDrink = function() {
+    console.log(this.drink.ingredients)
+    console.log('DRINK IS BEING MADE');
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
     $scope.selectedDrink = {
       drink : this.drink.ingredients,
       title : this.drink.title,
       user : Auth.currentUser()._doc._id
     };
+<<<<<<< HEAD
     socket.emit('drink', $scope.selectedDrink);
   };
 
@@ -207,6 +236,10 @@ angular.module('mainCtrls', ['BarServices'])
     } else {
       console.log(info.message.toString());
     };
+=======
+    socket.emit('drink', $scope.selectedDrink)
+    $scope.orderSuccess();
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
   };
 
   $scope.addFav = function(id) {
@@ -436,10 +469,13 @@ angular.module('mainCtrls', ['BarServices'])
   	var message = '<strong>Success!</strong> Your drink should be on the way soon.';
   	Flash.create('orderSuccess', message);
   };
+<<<<<<< HEAD
   $scope.orderFailure = function() {
   	var message = '<strong>Failure!</strong> Wait a minute or two and try again, robot is making someone elses drink!';
   	Flash.create('orderSuccess', message);
   };
+=======
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
   $scope.isRoot = function() {
     var user = Auth.currentUser();
     if(user) var userName = user._doc.name;
@@ -453,6 +489,7 @@ angular.module('mainCtrls', ['BarServices'])
     .then(function(response) {
       $scope.results = response.data.drinks;
   });
+<<<<<<< HEAD
 
   // socket.on('fail', function(){
   //   $scope.orderFailure();
@@ -461,6 +498,8 @@ angular.module('mainCtrls', ['BarServices'])
   //   console.log('success function');
   //   $scope.orderSuccess();
   // })
+=======
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
 
   $scope.orderDrink = function() {
     console.log(this.drink.ingredients)
@@ -471,7 +510,11 @@ angular.module('mainCtrls', ['BarServices'])
       user : Auth.currentUser()._doc._id
     };
     socket.emit('drink', $scope.selectedDrink)
+<<<<<<< HEAD
     // $scope.orderSuccess();
+=======
+    $scope.orderSuccess();
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
   }
   $scope.removeHTML = function(drink) {
     console.log(drink)
@@ -479,7 +522,11 @@ angular.module('mainCtrls', ['BarServices'])
   		if($scope.results[i]._id === drink.id){
   			$scope.results.splice(i,1)
   		} else {
+<<<<<<< HEAD
   			console.log("Not this one "+ $scope.results[i]._id)
+=======
+  			console.log("Not this one "+ $scope.drinkMenu[i]._id)
+>>>>>>> 56c4115d9157d1963b5559086ed314763146a035
   		}
   	};
   };

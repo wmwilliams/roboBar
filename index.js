@@ -248,6 +248,9 @@ mongoose.connection.once('open', function(){
 
 		function makeCalculation(data) {
 			console.log("make calculation function");
+			console.log(data.title);
+			console.log(data.user);
+			isBusy = true
 			var alcoholTotal = 0;
 			var mixerTotal = 0;
 			var ingRates = {
@@ -342,6 +345,6 @@ mongoose.connection.once('open', function(){
 		_.each(routes, function(controller, route) {
 			app.use(route, controller);
 		});
-		server.listen(process.env.PORT || 3000);
+		server.listen(process.env.PORT || 3001);
 	});
 });
